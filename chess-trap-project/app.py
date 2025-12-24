@@ -7,6 +7,28 @@ import tensorflow as tf
 import io
 import os
 
+import os  # Make sure this is imported at the top
+
+@st.cache_resource
+def load_model():
+    # 1. Get the path to the current folder where app.py is
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    # 2. Combine it with the model filename
+    model_path = os.path.join(current_dir, 'trap_model.h5')
+    
+    # 3. DEBUG: Print where we are looking (Check your logs if it fails again)
+    print(f"Looking for model at: {model_path}")
+    
+    # 4. Check if file actually exists
+    if not os.path.exists(model_path):
+        # This will show a clear error on the screen if the file is missing
+        st.error(f"Model file not found at: {model_path}")
+        st.write("Current files in this folder:", os.listdir(current_dir))
+        return None
+    
+    return tf.keras.models.load_model(model_path)
+
 # --- PAGE CONFIG ---
 st.set_page_config(page_title="Chess Trap Detector", layout="wide")
 
