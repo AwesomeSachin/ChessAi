@@ -9,25 +9,35 @@ import os
 
 import os  # Make sure this is imported at the top
 
+import os
+
 @st.cache_resource
 def load_model():
-    # 1. Get the path to the current folder where app.py is
-    current_dir = os.path.dirname(os.path.abspath(__file__))
+    # 1. Get the current directory where app.py is running
+    current_dir = os.getcwd()
+    st.write(f"📂 Current Working Directory: {current_dir}")
     
-    # 2. Combine it with the model filename
-    model_path = os.path.join(current_dir, 'trap_model.h5')
+    # 2. List ALL files in this directory (so we can see if the model is there)
+    files_in_dir = os.listdir(current_dir)
+    st.write("📄 Files found here:", files_in_dir)
     
-    # 3. DEBUG: Print where we are looking (Check your logs if it fails again)
-    print(f"Looking for model at: {model_path}")
+    # 3. Define the model path
+    model_filename = 'trap_model.h5'
     
-    # 4. Check if file actually exists
-    if not os.path.exists(model_path):
-        # This will show a clear error on the screen if the file is missing
-        st.error(f"Model file not found at: {model_path}")
-        st.write("Current files in this folder:", os.listdir(current_dir))
+    # 4. Check if it exists
+    if model_filename not in files_in_dir:
+        st.error(f"❌ I cannot find '{model_filename}' in this folder.")
+        st.error("Please make sure trap_model.h5 is uploaded to the same folder as app.py on GitHub.")
         return None
-    
-    return tf.keras.models.load_model(model_path)
+        
+    # 5. Load it
+    try:
+        model = tf.keras.models.load_model(model_filename)
+        st.success("✅ Model Loaded Successfully!")
+        return model
+    except Exception as e:
+        st.error(f"❌ File found, but failed to load. Is it a valid .h5 file? Error: {e}")
+        return None
 
 # --- PAGE CONFIG ---
 st.set_page_config(page_title="Chess Trap Detector", layout="wide")
